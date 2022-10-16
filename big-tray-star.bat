@@ -1,0 +1,1 @@
+call .\venv\Scripts\python.exe big-tray-star

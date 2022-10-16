@@ -1,10 +1,13 @@
+from pprint import pprint
+
 import spotipy
 from spotipy import SpotifyOAuth
 
-from big_tray_star import json_logger
-from big_tray_star.const import scope
-from big_tray_star.my_dynamodb import get_item, put_item
-from big_tray_star.ssm import get_parameters
+import json_logger
+from const import scope
+from my_dynamodb import get_item, put_item
+from discord_webhook import post_discord
+from ssm import get_parameters
 
 logger = json_logger.get_logger(__name__)
 
@@ -68,13 +71,23 @@ def get_top_tracks():
 
 
 def new_album_notification():
+    after = None
+    while True:
+        # ページネーション
+        after = new_album_notification_page(after)
+        if not after:
+            break
+
+
+def new_album_notification_page(after=None):
     # フォローアーティスト取得
-    response = sp.current_user_followed_artists(limit=50)
+    response = sp.current_user_followed_artists(limit=50, after=after)
     for artist in response['artists']['items']:
         artist_id = artist['id']
         # アルバム情報取得
         albums = sp.artist_albums(artist['uri'])
-        album_id = albums['items'][0]['id']
+        album = albums['items'][0]
+        album_id = album['id']
         new_item = {'artist_id': artist_id, 'album_id': album_id}
 
         # dynamodb上の最新アルバムを取得
@@ -84,7 +97,17 @@ def new_album_notification():
             dynamodb_album_id = db_item['Item']['album_id']
             # apiから取得したIDとDB値が異なる場合、通知する
             if album_id != dynamodb_album_id:
+                # 更新
                 put_item(table_name, new_item)
-                print('つうち')
+                post_discord(album['external_urls']['spotify'])
         else:
+            # 新規追加
             put_item(table_name, new_item)
+    after = exists(response, ['artists', 'cursors', 'after'])
+    return after
+
+
+def exists(obj, chain):
+    _key = chain.pop(0)
+    if _key in obj:
+        return exists(obj[_key], chain) if chain else obj[_key]

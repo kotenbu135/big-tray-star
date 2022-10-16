@@ -5,8 +5,8 @@ import schedule
 from PIL import Image
 from pystray import Icon, MenuItem, Menu
 
-from big_tray_star import json_logger
-from big_tray_star.my_spotify import get_top_tracks, add_playlist_current_playing, new_album_notification
+import json_logger
+from my_spotify import get_top_tracks, add_playlist_current_playing, new_album_notification
 
 logger = json_logger.get_logger(__name__)
 
@@ -61,6 +61,6 @@ class TaskTray:
         self.icon.run()
 
 
-if __name__ == '__main__':
+def main():
     system_tray = TaskTray(image="app.jpg")
     system_tray.run_program()
