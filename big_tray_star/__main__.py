@@ -1,4 +1,3 @@
 if __name__ == '__main__':
-    from app import main
-
+    from my_tkinter import main
     main()

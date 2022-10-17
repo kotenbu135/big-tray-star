@@ -1,6 +1,5 @@
 import time
 import urllib.parse
-from pprint import pprint
 
 import spotipy
 from spotipy import SpotifyOAuth

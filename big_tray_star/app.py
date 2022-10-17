@@ -63,12 +63,12 @@ class TaskTray:
         self.icon.run()
 
 
-def main():
-    logger.info('start')
-    system_tray = TaskTray(image="app.jpg")
-    system_tray.run_program()
-    logger.info('end')
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     logger.info('start')
+#     system_tray = TaskTray(image="app.jpg")
+#     system_tray.run_program()
+#     logger.info('end')
+#
+#
+# if __name__ == '__main__':
+#     main()
