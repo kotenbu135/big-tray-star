@@ -11,27 +11,6 @@ dynamodb = boto3.resource('dynamodb')
 #                               aws_secret_access_key='ACCESS_KEY')
 
 
-def delete_table(table_name):
-    try:
-        table = dynamodb.Table(table_name)
-        table.delete()
-    except dynamodb.meta.client.exceptions.ResourceNotFoundException as e:
-        pass
-
-
-def put_item(table_name, item):
-    table = dynamodb.Table(table_name)
-    table.put_item(
-        Item=item
-    )
-
-
-def get_item(table_name, artist):
-    table = dynamodb.Table(table_name)
-    response = table.get_item(Key=artist)
-    return response
-
-
 def create_spotify_followed_artist_latest_album(table_name):
     table = dynamodb.create_table(
         TableName=table_name,
@@ -47,10 +26,7 @@ def create_spotify_followed_artist_latest_album(table_name):
                 'AttributeType': 'S'
             }
         ],
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 10,
-            'WriteCapacityUnits': 10
-        }
+        BillingMode='PAY_PER_REQUEST'
     )
 
     print('Table status:', table.table_status)
@@ -58,8 +34,7 @@ def create_spotify_followed_artist_latest_album(table_name):
 
 def init_table():
     table_name = 'spotify_followed_artist_latest_album'
-    delete_table(table_name)
-    create_spotify_followed_artist_latest_album('spotify_followed_artist_latest_album')
+    create_spotify_followed_artist_latest_album(table_name)
 
 
 if __name__ == '__main__':
