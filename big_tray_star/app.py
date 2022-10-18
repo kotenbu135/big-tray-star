@@ -7,6 +7,7 @@ from pystray import Icon, MenuItem, Menu
 
 import json_logger
 from my_spotify import get_top_tracks, add_playlist_current_playing, new_album_notification
+from my_switch_bot import open_intercom
 
 logger = json_logger.get_logger(__name__)
 
@@ -29,7 +30,8 @@ class TaskTray:
         image = Image.open(image)
         # 右クリックで表示されるメニュー
         menu = Menu(
-            MenuItem('get_top_tracks', get_top_tracks),
+            MenuItem('Spotify My Top', get_top_tracks),
+            MenuItem('インターホン解錠', open_intercom),
             MenuItem('Exit', self.stop_program),
         )
 
@@ -61,14 +63,3 @@ class TaskTray:
 
         # 実行
         self.icon.run()
-
-
-# def main():
-#     logger.info('start')
-#     system_tray = TaskTray(image="app.jpg")
-#     system_tray.run_program()
-#     logger.info('end')
-#
-#
-# if __name__ == '__main__':
-#     main()
