@@ -14,11 +14,13 @@ windowsのタスクトレイに常駐するアプリケーションです。
 
 ### 手動実行
 1. spotifyで再生回数上位の曲をプレイリストに登録する
+1. インターホンを解錠する
 
 ## 利用方法
 
 1. <a href="https://spotipy.readthedocs.io/en/master/">Windows環境にAWS認証情報を設定する</a>
 1. 後述のAWS Systems Manager パラメータストアを設定する
+1. `python init-switch-bot`を実行しコンソールログからインターホン解錠用BotのデバイスIDを取得する
 1. `python init-dynamodb`を実行しAWS上にdynamodbテーブルを作成する
 1. `pip install -r requirements.txt` を実行
 1. `big-tray-star.bat` を実行
@@ -35,3 +37,5 @@ windowsのタスクトレイに常駐するアプリケーションです。
 | spotify プレイリストID（再生回数上位（短期）） | /spotify/playlist_id/short_term_rank  |
 | spotify プレイリストID（再生回数上位（中期）） | /spotify/playlist_id/medium_term_rank |
 | spotify プレイリストID（再生回数上位（長期）） | /spotify/playlist_id/long_term_rank   |
+| switch bot トークン              | /switch_bot/token                     |
+| インターホン解錠用BotのデバイスID          | /switch_bot/device_id/bot_1           |
