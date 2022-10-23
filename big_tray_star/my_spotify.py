@@ -1,5 +1,6 @@
 import time
 import urllib.parse
+import webbrowser
 
 import spotipy
 from spotipy import SpotifyOAuth
@@ -26,7 +27,8 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=client_id,
     client_secret=client_secret,
     redirect_uri=redirect_uri,
-    scope=scope))
+    scope=scope),
+    language='ja')
 
 
 def get_all_playlist_items(playlist_id):
@@ -170,3 +172,23 @@ def exists(obj, chain):
     if _key in obj:
         # after str or None
         return exists(obj[_key], chain) if chain else obj[_key]
+
+
+def search_current_playing():
+    # 現在再生中の曲を取得する
+    current_playing = sp.current_user_playing_track()
+    if current_playing is None:
+        return
+
+    # 検索文字列作成
+    track_name = current_playing['item']['name']
+    artist = current_playing['item']['artists'][0]['name']
+    search_params = ' '.join([track_name, artist])
+
+    # URL作成
+    url = "https://www.google.com/search"
+    params = urllib.parse.urlencode({"query": search_params})
+    search_url = f'{url}?{params}'
+
+    # ブラウザで検索する
+    webbrowser.open(search_url)
