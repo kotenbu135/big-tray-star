@@ -56,6 +56,30 @@ def get_all_playlist_items(playlist_id):
         logger.error(e)
 
 
+def get_all_playlists():
+    offset = 0
+    next_flg = 'True'
+    try:
+        # 現在のプレイリストの曲ID一覧を取得する
+        latest_playlists = []
+        while next_flg is not None:
+            playlists = sp.current_user_playlists(limit=50, offset=offset)
+            for playlist in playlists['items']:
+                latest_playlists.append(playlist)
+
+            playlist_next = playlists['next']
+            if playlist_next is None:
+                break
+
+            queries = urllib.parse.urlparse(playlist_next).query
+            query_dict = urllib.parse.parse_qs(queries)
+            offset = query_dict['offset'][0]
+            time.sleep(10)
+        return latest_playlists
+    except Exception as e:
+        logger.error(e)
+
+
 def add_playlist_current_playing():
     try:
         # 現在のプレイリストの曲ID一覧を取得する
@@ -141,7 +165,6 @@ def artist_new_album_notification(artist):
         logger.info('新規追加')
         return
 
-    # apiから取得したIDとDB値が異なる場合、通知する
     if latest_album['album_id'] == db_item['Item']['album_id']:
         logger.info('変更なし')
         return
@@ -192,3 +215,43 @@ def search_current_playing():
 
     # ブラウザで検索する
     webbrowser.open(search_url)
+
+
+def playlist_update_notification(playlist):
+    playlist_id = playlist['id']
+    playlist_name = playlist['name']
+
+    # dynamodb上の最新アルバムを取得
+    table_name = 'spotify_playlist_latest_album'
+    db_item = get_item(table_name, {'playlist_id': playlist_id})
+    latest_album = get_all_playlist_items(playlist_id)[0]
+    latest_album_obj = {'playlist_id': playlist_id, 'playlist_name': playlist_name, 'latest_album': latest_album}
+
+    if 'Item' not in db_item:
+        put_item(table_name, latest_album_obj)
+        logger.info('新規追加')
+        return
+
+    if latest_album == db_item['Item']['latest_album']:
+        logger.info('変更なし')
+        return
+
+    put_item(table_name, latest_album_obj)
+    playlist_url = playlist['external_urls']['spotify']
+    post_discord(f'プレイリストが更新されました。\n{playlist_url}')
+    logger.info('更新')
+
+
+def playlist_update_notification_main():
+    # 自分のID取得
+    my_profile = sp.current_user()
+    my_id = my_profile['id']
+
+    # プレイリスト取得
+    playlists = get_all_playlists()
+
+    for playlist in playlists:
+        # 自分で作成したプレイリストを除外
+        if playlist['owner']['id'] == my_id:
+            continue
+        playlist_update_notification(playlist)

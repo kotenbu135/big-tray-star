@@ -6,7 +6,8 @@ from PIL import Image
 from pystray import Icon, MenuItem, Menu
 
 import json_logger
-from my_spotify import get_top_tracks, add_playlist_current_playing, new_album_notification, search_current_playing
+from my_spotify import get_top_tracks, add_playlist_current_playing, new_album_notification, search_current_playing, \
+    playlist_update_notification_main
 from my_switch_bot import open_intercom
 
 logger = json_logger.get_logger(__name__)
@@ -20,6 +21,11 @@ def run_schedule_add_playlist_current_playing():
 def run_schedule_new_album_notification():
     # 一定間隔でタスクを実行する。
     schedule.every(3).hours.do(new_album_notification)
+
+
+def run_schedule_playlist_update_notification():
+    # 一定間隔でタスクを実行する。
+    schedule.every(3).hours.do(playlist_update_notification_main)
 
 
 class TaskTray:

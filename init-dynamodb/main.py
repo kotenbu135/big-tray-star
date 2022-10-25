@@ -11,6 +11,27 @@ dynamodb = boto3.resource('dynamodb')
 #                               aws_secret_access_key='ACCESS_KEY')
 
 
+def create_spotify_playlist_latest_album(table_name):
+    table = dynamodb.create_table(
+        TableName=table_name,
+        KeySchema=[
+            {
+                'AttributeName': 'playlist_id',
+                'KeyType': 'HASH'
+            }
+        ],
+        AttributeDefinitions=[
+            {
+                'AttributeName': 'playlist_id',
+                'AttributeType': 'S'
+            }
+        ],
+        BillingMode='PAY_PER_REQUEST'
+    )
+
+    print('Table status:', table.table_status)
+
+
 def create_spotify_followed_artist_latest_album(table_name):
     table = dynamodb.create_table(
         TableName=table_name,
@@ -35,6 +56,8 @@ def create_spotify_followed_artist_latest_album(table_name):
 def init_table():
     table_name = 'spotify_followed_artist_latest_album'
     create_spotify_followed_artist_latest_album(table_name)
+    table_name = 'spotify_playlist_latest_album'
+    create_spotify_playlist_latest_album(table_name)
 
 
 if __name__ == '__main__':
