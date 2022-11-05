@@ -21,6 +21,7 @@ class JsonFormatter(jsonlogger.JsonFormatter):
             'timestamp',
             'level',
             'name',
+            'funcName',
             'message',
             'stack_info',
         ]

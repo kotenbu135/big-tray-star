@@ -50,7 +50,7 @@ def get_all_playlist_items(playlist_id):
             queries = urllib.parse.urlparse(playlist_next).query
             query_dict = urllib.parse.parse_qs(queries)
             offset = query_dict['offset'][0]
-            time.sleep(10)
+            time.sleep(3)
         return latest_playlist_tracks
     except Exception as e:
         logger.error(e)
@@ -74,7 +74,7 @@ def get_all_playlists():
             queries = urllib.parse.urlparse(playlist_next).query
             query_dict = urllib.parse.parse_qs(queries)
             offset = query_dict['offset'][0]
-            time.sleep(10)
+            time.sleep(3)
         return latest_playlists
     except Exception as e:
         logger.error(e)
@@ -124,7 +124,7 @@ def get_top_tracks():
 
         post_discord(f'https://open.spotify.com/playlist/{playlist_id}')
         # レート対策
-        time.sleep(10)
+        time.sleep(3)
 
 
 def clear_playlist(playlist_id):
@@ -147,7 +147,7 @@ def new_album_notification_main():
     for artist in response['artists']['items']:
         artist_new_album_notification(artist)
         # レート対策
-        time.sleep(10)
+        time.sleep(3)
     after = exists(response, ['artists', 'cursors', 'after'])
     return after
 
@@ -162,16 +162,16 @@ def artist_new_album_notification(artist):
 
     if 'Item' not in db_item:
         put_item(table_name, latest_album)
-        logger.info('新規追加')
+        logger.info('新規追加', extra=latest_album)
         return
 
     if latest_album['album_id'] == db_item['Item']['album_id']:
-        logger.info('変更なし')
+        logger.info('変更なし', extra=latest_album)
         return
 
     put_item(table_name, latest_album)
-    post_discord(latest_album['url'])
-    logger.info('更新')
+    post_discord(latest_album['album_url'])
+    logger.info('更新', extra=latest_album)
 
 
 def get_latest_album(artist):
@@ -229,17 +229,17 @@ def playlist_update_notification(playlist):
 
     if 'Item' not in db_item:
         put_item(table_name, latest_album_obj)
-        logger.info('新規追加')
+        logger.info('新規追加', extra=latest_album_obj)
         return
 
     if latest_album == db_item['Item']['latest_album']:
-        logger.info('変更なし')
+        logger.info('変更なし', extra=latest_album_obj)
         return
 
     put_item(table_name, latest_album_obj)
     playlist_url = playlist['external_urls']['spotify']
     post_discord(f'プレイリストが更新されました。\n{playlist_url}')
-    logger.info('更新')
+    logger.info('更新', extra=latest_album_obj)
 
 
 def playlist_update_notification_main():
