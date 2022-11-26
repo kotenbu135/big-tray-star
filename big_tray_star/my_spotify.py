@@ -122,7 +122,6 @@ def get_top_tracks():
         clear_playlist(playlist_id)
         sp.playlist_add_items(playlist_id, urls)
 
-        post_discord(f'https://open.spotify.com/playlist/{playlist_id}')
         # レート対策
         time.sleep(3)
 

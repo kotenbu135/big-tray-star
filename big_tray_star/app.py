@@ -28,6 +28,11 @@ def run_schedule_playlist_update_notification():
     schedule.every(3).hours.do(playlist_update_notification_main)
 
 
+def run_schedule_get_top_tracks():
+    # 一定間隔でタスクを実行する。
+    schedule.every(3).hours.do(get_top_tracks)
+
+
 class TaskTray:
     def __init__(self, image):
         self.status = False
@@ -36,7 +41,6 @@ class TaskTray:
         image = Image.open(image)
         # 右クリックで表示されるメニュー
         menu = Menu(
-            MenuItem('Spotify My Top', get_top_tracks),
             MenuItem('再生中の曲を検索', search_current_playing),
             MenuItem('インターホン解錠', open_intercom),
             MenuItem('Exit', self.stop_program),
